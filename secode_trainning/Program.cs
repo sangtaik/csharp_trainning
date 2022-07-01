@@ -1,78 +1,55 @@
-﻿/*
-C# Network Programming 
-by Richard Blum
+﻿// 그런데 목록을 순회하기 위해 자원을 할당해야 하고 순회가 끝나면 해제하고 싶을때가 있죠?
+// 또는 목록을 순회하는 동안 락을 걸어 thread-safe하게 코드를 만들고 싶을 수도 있습니다. 그러려면 순회를 시작하는 시점에서 lock을 하고 끝나는 시점에서 lock을 해제해야 하는데요, 이럴 때 IEnumerator 구현체에 IDisposable 인터페이스를 구현하면 됩니다.
 
-Publisher: Sybex 
-ISBN: 0782141765
-*/
-using System;
-using System.Net;
-using System.Net.Sockets;
-using System.Text;
-using System.Threading;
+using System.Collections;
 
-public class ThreadPoolTcpSrvr
+var de = new DisposableEnumerable();
+
+foreach (var value in de)
 {
-   private TcpListener client;
-
-   public ThreadPoolTcpSrvr()
-   {
-      client = new TcpListener(9050);
-      client.Start();
-
-      Console.WriteLine("Waiting for clients...");
-      while(true)
-      {
-         while (!client.Pending())
-         {
-            Thread.Sleep(1000);
-         }
-         ConnectionThread newconnection = new ConnectionThread();
-         newconnection.threadListener = this.client;
-         ThreadPool.QueueUserWorkItem(new
-                    WaitCallback(newconnection.HandleConnection));
-      }
-   }
-
-   public static void Main()
-   {
-      ThreadPoolTcpSrvr tpts = new ThreadPoolTcpSrvr();
-   }
+    Console.WriteLine(value);
 }
 
-class ConnectionThread
+public class DisposableEnumerable : IEnumerable<int>
 {
-   public TcpListener threadListener;
-   private static int connections = 0;
+    public IEnumerator<int> GetEnumerator()
+    {
+        return new DisposableEnumerator();
+    }
 
-   public void HandleConnection(object state)
-   {
-      int recv;
-      byte[] data = new byte[1024];
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
+    }
+}
 
-      TcpClient client = threadListener.AcceptTcpClient();
-      NetworkStream ns = client.GetStream();
-      connections++;
-      Console.WriteLine("New client accepted: {0} active connections",
-                         connections);
 
-      string welcome = "Welcome to my test server";
-      data = Encoding.ASCII.GetBytes(welcome);
-      ns.Write(data, 0, data.Length);
 
-      while(true)
-      {
-         data = new byte[1024];
-         recv = ns.Read(data, 0, data.Length);
-         if (recv == 0)
-            break;
-      
-         ns.Write(data, 0, recv);
-      }
-      ns.Close();
-      client.Close();
-      connections--;
-      Console.WriteLine("Client disconnected: {0} active connections",
-                         connections);
-   }
+
+public class DisposableEnumerator : IEnumerator<int>, IDisposable
+{
+    private int _value;
+
+    public int Current => _value;
+
+    object IEnumerator.Current => Current;
+
+    public void Dispose()
+    {
+        Console.WriteLine("Call Dispose!");
+    }
+
+    public bool MoveNext()
+    {
+        _value++;
+        if (_value is 10)
+            return false;
+
+        return true;
+    }
+
+    public void Reset()
+    {
+        _value = 0;
+    }
 }
