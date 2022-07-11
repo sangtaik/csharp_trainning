@@ -36,6 +36,8 @@ namespace MultithreadingTutorial
                 if (userInput == 10) { t1.Run10(); continue;}
                 if (userInput == 11) { t1.Run11(); continue;}
                 if (userInput == 12) { t1.Run12(); continue;}
+                if (userInput == 13) { t1.Run13(); continue;}
+                if (userInput == 14) { t1.Run14(); continue;}
                 if (userInput == 13) { akshay.Run(); continue;}
 
 
@@ -48,7 +50,7 @@ namespace MultithreadingTutorial
                 {
                     Console.WriteLine("");
                     Console.WriteLine();
-                    Console.WriteLine("1. thread one, 2. thread two, 3. thread join, 4. thread sleep, 5. sleep + join, 6. join");
+                    Console.WriteLine("1. thread no option, 2. thread join, 3. thread sleep, 4. thread join and sleep, ... 5~8 logic no option ..., 9 ~ 12 two thread no option ....");
                     Console.WriteLine("0. exit");
                     int result;
                     if (Int32.TryParse(Console.ReadLine(), out result))

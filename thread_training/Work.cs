@@ -212,7 +212,7 @@ namespace MultithreadingTutorial
             thread2.Start();
 
             thread1.Join();
-            thread2.Join();
+            // thread2.Join();
 
             Console.WriteLine("Main Thread Ends");
             Console.ReadKey();
@@ -249,7 +249,44 @@ namespace MultithreadingTutorial
             thread2.Start();
 
             Thread.Sleep(1000);
+            thread1.Join();
+
+            Console.WriteLine("Main Thread Ends");
+            Console.ReadKey();
+        }
+
+        public void Run13()
+        {
+            Work w = new Work();
+            Console.WriteLine("Main Thread Start");
+
+            ThreadStart s1 = w.Count;
+            ThreadStart s2 = w.Alpabets;
+            Thread thread1 = new Thread(s1);
+            Thread thread2 = new Thread(s2);
+            thread1.Start();
+            thread2.Start();
+
             thread2.Join();
+
+            Console.WriteLine("Main Thread Ends");
+            Console.ReadKey();
+        }
+
+        public void Run14()
+        {
+            Work w = new Work();
+            Console.WriteLine("Main Thread Start");
+
+            ThreadStart s1 = w.Count;
+            ThreadStart s2 = w.Alpabets;
+            Thread thread1 = new Thread(s1);
+            Thread thread2 = new Thread(s2);
+            thread1.Start();
+            thread2.Start();
+
+            Thread.Sleep(1000);
+            Thread.Sleep(1000);
 
             Console.WriteLine("Main Thread Ends");
             Console.ReadKey();
