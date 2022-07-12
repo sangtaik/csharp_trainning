@@ -57,6 +57,26 @@ namespace MultiTaskingShareResourceTutorial
     }
 
 
+class WorkInterLock {
+        static int num = 0;
+        // static object conch = new object();
+        public void MethodA()
+        {
+            for (int i = 0; i < 50000; i++)
+            {
+                Interlocked.Increment(ref num);
+            }
+        }
+        public void MethodB()
+        {
+            for (int i = 0; i < 50000; i++)
+            {
+                Interlocked.Decrement(ref num);
+            }
+        }
+    }
+
+
     class MultiTaskingTutorial
     {
         public void Run1() 
@@ -80,10 +100,30 @@ namespace MultiTaskingShareResourceTutorial
             동기화 문제를 해결하기 위해서는 lock으로 num을 접근하는 코드에 넣어서 해결할 수 있다.
             아래 예제는 동기화 이슈를 해결한 코드이다.
             물론 소요시간은 위에 예제보다 더 많이 걸리게 된다. lock이 걸리면 다른 스레드는 대기하기 때문에 시간이 오래 걸린다.
+            
+            단점 : locker문제는 잠금이 느리고 실제로 관련이없는 다른 곳에서 재사용하면 아무 이유없이 다른 스레드를 차단할 수 있다는 것이다.
             */
             Console.WriteLine("Main Thread Start");
 
             WorkLock w = new WorkLock();
+            Task aTask = Task.Factory.StartNew(w.MethodA);
+            Task bTask = Task.Factory.StartNew(w.MethodB);
+            Task.WaitAll(new Task[] { aTask, bTask });
+            
+            Console.WriteLine("Main Thread Ends");
+        }
+
+        public void Run3() 
+        {
+            /* 
+            lock보다 더 좋은 제안입니다.
+            중단될 수 없는 '원 히트'로 읽기, 증가 및 쓰기를 효과적으로 수행하므로 안전합니다. 
+            이 때문에 다른 코드에는 영향을 미치지 않으며 다른 코드도 잠그는 것을 기억할 필요가 없습니다. 
+            또한 매우 빠릅니다(MSDN에서 말했듯이 최신 CPU에서 이것은 종종 말 그대로 단일 CPU 명령입니다).
+            */
+            Console.WriteLine("Main Thread Start");
+
+            WorkInterLock w = new WorkInterLock();
             Task aTask = Task.Factory.StartNew(w.MethodA);
             Task bTask = Task.Factory.StartNew(w.MethodB);
             Task.WaitAll(new Task[] { aTask, bTask });

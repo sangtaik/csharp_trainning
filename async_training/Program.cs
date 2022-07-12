@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics; // Stopwatch
 
-namespace MultiTaskingShareResourceTutorial
+namespace Async_Tutorial
 {
 
     class Program
@@ -14,7 +14,7 @@ namespace MultiTaskingShareResourceTutorial
                 userInput = DisplayMenu();
                 var timer = Stopwatch.StartNew();  //시간 측정 시작
                 // 실행 로직
-                MultiTaskingTutorial t1 = new MultiTaskingTutorial();
+                Tutorial t1 = new Tutorial();
                 if (t1 is not null) {
                     if (userInput == 0) { System.Environment.Exit(1);}
                     if (userInput == 1) { t1.Run1(); printTime(timer); Console.ReadLine(); continue;}
@@ -39,7 +39,7 @@ namespace MultiTaskingShareResourceTutorial
                 {
                     Console.WriteLine("");
                     Console.WriteLine(); 
-                    Console.WriteLine(@"1. no lock, 2. lock thread, 3. interlocked");
+                    Console.WriteLine(@"1. sync, 2. async, 3. async 2");
                     Console.WriteLine("0. exit");
                     int result;
                     if (Int32.TryParse(Console.ReadLine(), out result))
